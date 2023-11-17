@@ -1,5 +1,7 @@
 module Series1
 
+import IO;
+import List;
 
 /*
  * Documentation: https://www.rascal-mpl.org/docs/GettingStarted/
@@ -14,6 +16,7 @@ module Series1
  */
  
 void helloWorld() {
+  println("Hello Word");
 } 
 
 
@@ -23,12 +26,54 @@ void helloWorld() {
  * - implement as list-returning function
  */
  
-void fizzBuzz() {
-
+void fizzBuzzImp() {
+  for (int n <- [1..100]) {
+    if (n % 15 == 0) {
+      println("FizzBuzz");
+    } else if (n % 3 == 0) {
+      println("Fizz");
+    } else if (n % 5 == 0) {
+        println("Buzz");
+    } else {
+        println(n);
+    }
+  }
 }
 
-list[str] fizzBuzz() {
-  return []; // replace
+list[str] fizzBuzzList() {
+  return fizzBuzzHelper([], 1);
+}
+
+list[str] fizzBuzzHelper(list[str] l, int n) {
+  if (n == 100) {
+    return l;
+  } else if (n % 15 == 0) {
+    return fizzBuzzHelper(l + ["FizzBuzz"], n + 1);
+  } else if (n % 3 == 0) {
+    return fizzBuzzHelper(l + ["Fizz"], n + 1);
+  } else if (n % 5 == 0) {
+    return fizzBuzzHelper(l + ["Buzz"], n + 1);
+  } else {
+    return fizzBuzzHelper(l + ["<n>"], n + 1);
+  }
+}
+
+
+
+list[value] fizzBuzzLoop() {
+  result = [];
+  for (int n <- [1..100]) {
+    if (n % 15 == 0) {
+      result += ["FizzBuzz"];
+    } else if (n % 3 == 0) {
+      result += ["Fizz"];
+    } else if (n % 5 == 0) {
+      result += ["Buzz"];
+    } else {
+      result += [n];
+    }
+  }
+  return result;
 }
 
 /*
@@ -37,17 +82,19 @@ list[str] fizzBuzz() {
  * - then using pattern-based dispatch 
  *  (complete the definition with a default case)
  */
- 
-
-
-int fact(0) = 1;
-int fact(1) = 1;
-
 default int factorial(int n) {
-  return -1; // <- replace
+  switch (n) {
+    case 0: return 1;
+    default: return n * factorialP(n - 1);
+  }
 }
 
+int factorialP(0) = 1;
+int factorialP(1) = 1;
 
+default int factorialP(int n) {
+  return n * factorialP(n-1);
+}
 
 
 /*
@@ -56,16 +103,25 @@ default int factorial(int n) {
  */
  
 void comprehensions() {
-
   // construct a list of squares of integer from 0 to 9 (use range [0..10])
+  list[int] squares = [n * n | n <- [0..10]];
+  println(squares);
   
   // same, but construct a set
+  set[int] squares2 = {n * n | n <- [0..10]};
+  println(squares);
   
   // same, but construct a map
+  map[int, int] squares3 = (n : n * n | n <- [0..10]);
+  println(squares);
 
   // construct a list of factorials from 0 to 9
-  
-  // same, but now only for even numbers  
+  list[int] factorials = [factorial(n) | n <- [0..10]];
+  println(factorials);
+
+  // same, but now only for even numbers
+  list[int] factorialsEven = [factorial(n) | n <- [0..10], n % 2 == 0];
+  println(factorialsEven);
 }
  
 
@@ -82,18 +138,15 @@ void patternMatching() {
  
   // print all splits of list
   list[int] aList = [1,2,3,4,5];
-  for ([/*TODO*/] := aList) {
+  for ([] := aList) {
     ;
   }
   
   // print all partitions of a set
   set[int] aSet = {1,2,3,4,5};
-  for ({/*TODO*/} := aSet) {
+  for ({} := aSet) {
     ;
   } 
-
-  
-
 }  
  
  
