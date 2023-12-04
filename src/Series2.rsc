@@ -17,7 +17,7 @@ syntax Object
   ;
   
 syntax Element
-  = ; // Fill in  
+  = String : Value;
   
 syntax Value
   = String
@@ -32,10 +32,10 @@ syntax Null
   = "null";
   
 syntax Boolean
-  = // Fill in
-  | // Fill in
+  = "True"
+  | "False"
   ;  
-  
+
 syntax Array
   = "[" {Value ","}* "]"
   ;  
@@ -44,30 +44,33 @@ lexical String
   = [\"] ![\"]* [\"]; // slightly simplified
   
 lexical Number
-  = ; // Fill in. Hint; think of the pattern for numbers in regular expressions. How do you accept a number in a regex?  
+  = [1-9] [0-9]*; // Fill in. Hint; think of the pattern for numbers in regular expressions. How do you accept a number in a regex?  
 
 layout Whitespace = [\ \t\n]* !>> [\ \t\n];  
-  
+
 // import the module in the console
 start[JSON] example() 
   = parse(#start[JSON], 
-          "{
-          '  \"age\": 42, 
-          '  \"name\": \"Joe\",
-          '  \"address\": {
-          '     \"street\": \"Wallstreet\",
-          '     \"number\": 102
-          '  }
-          '}");    
+          "{\"g\":3}");    
   
+
+  
+
+//  '  \"name\": \"Joe\",
+//           '  \"address\": {
+//           '     \"street\": \"Wallstreet\",
+//           '     \"number\": 102
+//           '  }
+//           '
+
 
 
 // use visit/deep match to find all element names
 // - use concrete pattern matching
 // - use "<x>" to convert a String x to str
-set[str] propNames(start[JSON] json) {
+// set[str] propNames(start[JSON] json) {
 
-}
+// }
 
 // define a recursive transformation mapping JSON to map[str,value] 
 // - every Value constructor alternative needs a 'transformation' function

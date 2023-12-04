@@ -134,21 +134,20 @@ void comprehensions() {
 void patternMatching() {
   str hello = "Hello World!";
   
-  
- 
   // print all splits of list
   list[int] aList = [1,2,3,4,5];
-  for ([] := aList) {
-    ;
+  for ([*left, *right] := aList) {
+    print(left);
+    print("-");
+    println(right);
   }
   
   // print all partitions of a set
   set[int] aSet = {1,2,3,4,5};
-  for ({} := aSet) {
-    ;
-  } 
-}  
- 
+  for ({*left, *right} := aSet) {
+    println(left);
+  }
+}
  
  
 /*
@@ -157,43 +156,69 @@ void patternMatching() {
  *   constructors for binary red and black branches
  * - use the exampleTree() to test in the console
  */
- 
 data ColoredTree
-  = leaf(int n);
-  
+  = leaf(int n)
+  | red(ColoredTree left, ColoredTree right) 
+  | black(ColoredTree left, ColoredTree right);
+
 
 ColoredTree exampleTree()
   =  red(black(leaf(1), red(leaf(2), leaf(3))),
               black(leaf(4), leaf(5)));  
-  
+
   
 // write a recursive function summing the leaves
 // (use switch or pattern-based dispatch)
-
-int sumLeaves(ColoredTree t) = 0; // TODO: Change this!
+int sumLeaves(ColoredTree t) {
+  for (leaf(int n) := t) {
+    return n;
+  }
+  int sum = 0;
+  for (red(ColoredTree left, ColoredTree right) := t) {
+    sum = sum + sumLeaves(left);
+    sum = sum + sumLeaves(right);
+  }
+  for (black(ColoredTree left, ColoredTree right) := t) {
+    sum = sum + sumLeaves(left);
+    sum = sum + sumLeaves(right);
+  }
+  return sum;
+}
 
 // same, but now with visit
 int sumLeavesWithVisit(ColoredTree t) {
-  return -1; // <- replace
+  int sum = 0;
+  visit(t) {
+    case leaf(int n): sum = sum + n;
+  }
+  return sum;
 }
 
 // same, but now with a for loop and deep match
 int sumLeavesWithFor(ColoredTree t) {
-  return -1; // <- replace 
+  int sum = 0;
+  for(/int N := t)
+  sum = sum + N;
+  return sum;
 }
 
 // same, but now with a reducer and deep match
 // Reducer = ( <initial value> | <some expression with `it` | <generators> )
-int sumLeavesWithReducer(ColoredTree t) = 0; // TODO: Change this!
+int sumLeavesWithReducer(ColoredTree t) {
+  return (0 | it + e | /int e := t);
+}
 
 
 // add 1 to all leaves; use visit + =>
 ColoredTree inc1(ColoredTree t) {
-  return leaf(-1); // <- replace 
+  return visit (t) {
+    case leaf(int n) => leaf(n + 1)
+    // case leaf(int n): insert leaf(n+1);
+  };
 }
 
 // write a test for inc1, run from console using :test
-test bool testInc1() = false;
+test bool testInc1() = sumLeaves(inc1(exampleTree())) == 20; // 15+5=20
 
 // define a property for inc1, i.e. a boolean
 // function that checks if one tree is inc1 of the other
@@ -202,12 +227,21 @@ test bool testInc1() = false;
 // or pattern based dispatch.
 // Hint! The tree also needs to have the same shape!
 bool isInc1(ColoredTree t1, ColoredTree t2) {
-  return false; // <- replace
+  for (<red(ColoredTree l1, ColoredTree r1), red(ColoredTree l2, ColoredTree r2)> := <t1, t2>) {
+    return isInc1(l1, l2) && isInc1(r1, r2);
+  }
+  for (<black(ColoredTree l1, ColoredTree r1), black(ColoredTree l2, ColoredTree r2)> := <t1, t2>) {
+    return isInc1(l1, l2) && isInc1(r1, r2);
+  }
+  for (<leaf(int n1), leaf(int n2)> := <t1, t2>) {
+    return n1 + 1 == n2;
+  }
+  return false;
 }
  
 // write a randomized test for inc1 using the property
 // again, execute using :test
-test bool testInc1Randomized(ColoredTree t1) = false;
+test bool testInc1Randomized(ColoredTree t1) = isInc1(t1, inc1(t1));
 
 
  
