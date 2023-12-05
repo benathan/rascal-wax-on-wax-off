@@ -51,18 +51,20 @@ layout Whitespace = [\ \t\n]* !>> [\ \t\n];
 // import the module in the console
 start[JSON] example() 
   = parse(#start[JSON], 
-          "{\"g\":3}");    
+          "{
+          '  \"name\": \"Joe\",
+          '  \"address\": {
+          '     \"street\": \"Wallstreet\",
+          '     \"number\": 102
+          '  }
+          '}
+          ");    
   
+Tree testBool() = parse(#Boolean, "True");
+Tree testNumber() = parse(#Number, "745");
+Tree testString() = parse(#String, "String");
 
   
-
-//  '  \"name\": \"Joe\",
-//           '  \"address\": {
-//           '     \"street\": \"Wallstreet\",
-//           '     \"number\": 102
-//           '  }
-//           '
-
 
 
 // use visit/deep match to find all element names
