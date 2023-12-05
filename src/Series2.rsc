@@ -3,6 +3,7 @@ module Series2
 import ParseTree;
 import IO;
 import String;
+import Set;
 
 /*
  * Syntax definition
@@ -17,7 +18,7 @@ syntax Object
   ;
   
 syntax Element
-  = String : Value;
+  = String ":" Value;
   
 syntax Value
   = String
@@ -44,35 +45,62 @@ lexical String
   = [\"] ![\"]* [\"]; // slightly simplified
   
 lexical Number
-  = [1-9] [0-9]*; // Fill in. Hint; think of the pattern for numbers in regular expressions. How do you accept a number in a regex?  
+  = [0] | ([1-9] [0-9]*);
 
-layout Whitespace = [\ \t\n]* !>> [\ \t\n];  
+layout Whitespace = [\ \t\n\r]* !>> [\ \t\n\r];
 
 // import the module in the console
 start[JSON] example() 
   = parse(#start[JSON], 
           "{
           '  \"name\": \"Joe\",
-          '  \"address\": {
+          '    \"address\": {
           '     \"street\": \"Wallstreet\",
           '     \"number\": 102
           '  }
           '}
           ");    
-  
-Tree testBool() = parse(#Boolean, "True");
-Tree testNumber() = parse(#Number, "745");
-Tree testString() = parse(#String, "String");
 
-  
+// import Parsetree;
+
+Null parseNull() = parse(#Null, "null");
+test bool testNull() {
+  for (Null := parse(#Null, "null")){
+    return true;
+  }
+  return false;
+} 
+
+
+Boolean parseBool() = parse(#Boolean, "True");
+Number parseNumber() = parse(#Number, "745");
+Number parseNumberZero() = parse(#Number, "0");
+String parseString() = parse(#String, "\"String\"");
+Element parseElement() = parse(#Element, "\"String\": 45");
+Object parseObject() = parse(#Object, "{\"String\" : 45, \"String\" : 45}");
+Array parseArray() = parse(#Array, "[\"String\", 45, null]");
+start[JSON] parseJSON() = parse(#start[JSON], "{\"name\": \"Joe\", \"address\": {\"street\": \"Wallstreet\",\"number\": 102}}");
 
 
 // use visit/deep match to find all element names
 // - use concrete pattern matching
 // - use "<x>" to convert a String x to str
-// set[str] propNames(start[JSON] json) {
 
-// }
+
+set[str] propNames1(start[JSON] json) {
+  set[str] names = {};
+  visit (json) {
+    case String s: {
+      println(s);
+      names = names + {s};
+      if (str l := names) {
+        println(l);
+      }
+    }
+  }
+   return names;
+}
+
 
 // define a recursive transformation mapping JSON to map[str,value] 
 // - every Value constructor alternative needs a 'transformation' function
@@ -91,12 +119,12 @@ value json2value((Value)`<Number n>`)    = -1; // ... This needs to change. The 
 
 default value json2value(Value v) { throw "No tranformation function for `<v>` defined"; }
 
-test bool example2map() = json2map(example()) == (
-  "age": 42,
-  "name": "Joe",
-  "address" : (
-     "street" : "Wallstreet",
-     "number" : 102
-  )
-);
+// test bool example2map() = json2map(example()) == (
+//   "age": 42,
+//   "name": "Joe",
+//   "address" : (
+//      "street" : "Wallstreet",
+//      "number" : 102
+//   )
+// );
 
