@@ -53,13 +53,22 @@ layout Whitespace = [\ \t\n\r]* !>> [\ \t\n\r];
 start[JSON] example() 
   = parse(#start[JSON], 
           "{
+          '  \"age\": 42, 
           '  \"name\": \"Joe\",
           '    \"address\": {
           '     \"street\": \"Wallstreet\",
           '     \"number\": 102
           '  }
+<<<<<<< Updated upstream
           '}
           ");    
+=======
+          '}");
+  
+Tree testBool() = parse(#Boolean, "True");
+Tree testNumber() = parse(#Number, "745");
+Tree testString() = parse(#String, "String");
+>>>>>>> Stashed changes
 
 // import Parsetree;
 
@@ -85,6 +94,7 @@ start[JSON] parseJSON() = parse(#start[JSON], "{\"name\": \"Joe\", \"address\": 
 // use visit/deep match to find all element names
 // - use concrete pattern matching
 // - use "<x>" to convert a String x to str
+<<<<<<< Updated upstream
 
 
 set[str] propNames1(start[JSON] json) {
@@ -101,6 +111,11 @@ set[str] propNames1(start[JSON] json) {
    return names;
 }
 
+=======
+set[str] propNames(start[JSON] json) {
+
+}
+>>>>>>> Stashed changes
 
 // define a recursive transformation mapping JSON to map[str,value] 
 // - every Value constructor alternative needs a 'transformation' function
