@@ -4,6 +4,7 @@ import ParseTree;
 import IO;
 import String;
 import Set;
+import Map;
 
 /*
  * Syntax definition
@@ -87,37 +88,51 @@ start[JSON] parseJSON() = parse(#start[JSON], "{\"name\": \"Joe\", \"address\": 
 // - use "<x>" to convert a String x to str
 
 
-set[str] propNames1(start[JSON] json) {
+set[str] propNames2(start[JSON] json) {
   set[str] names = {};
   visit (json) {
     case String s: {
-      println(s);
-      names = names + {s};
-      if (str l := names) {
-        println(l);
-      }
+      names = names + "<s>";
     }
   }
    return names;
 }
 
-
 // define a recursive transformation mapping JSON to map[str,value] 
 // - every Value constructor alternative needs a 'transformation' function
 // - define a data type for representing null;
 
-map[str, value] json2map(start[JSON] json) = json2map(json.top);
+data Null = null();
 
-map[str, value] json2map((JSON)`<Object obj>`)  = json2map(obj);
-map[str, value] json2map((Object)`{<{Element ","}* elems>}`) = ( /* Create the map using a comprehension */);
+// map[str, value] json2map(start[JSON] json) = json2map(json.top);
+
+// map[str, value] json2map((JSON)`<Object obj>`) ;
+
+// map[str, value] json2map((Object)`<Element e>`) = json2map(e);
+// map[str, value] json2map((Element)`<String s> : <Value v>`) = map[str, value] ( "<s>" <- json2value(v) ) + json2map(v);
+
+// generics &t
+
+
+
+
 
 str unquote(str s) = s[1..-1];
+int toInt((Number)`str s`) = toInt(s);
 
-value json2value((Value)`<String s>`)    = unquote("<s>"); // This is an example how to transform the String literal to a value
-value json2value((Value)`<Number n>`)    = -1; // ... This needs to change. The String module contains a function to convert a str to int
-// The other alternatives are missing. You need to add them.
-
+value json2value((Value)`<String s>`) = unquote("<s>");
+value json2value((Value)`<Number n>`) = toInt(unquote("<n>"));
+value json2value((Value)`<Array a>`) = a;
+value json2value((Value)`<Boolean b>`) = b;
+value json2value((Value)`null`) = null();
 default value json2value(Value v) { throw "No tranformation function for `<v>` defined"; }
+
+
+
+ // This is an example how to transform the String literal to a value
+// value json2value((Value)`<Number n>`)    = toInt(n); // ... This needs to change. The String module contains a function to convert a str to int
+// int toInt(str s) throws IllegalArgumentx3;
+
 
 // test bool example2map() = json2map(example()) == (
 //   "age": 42,
